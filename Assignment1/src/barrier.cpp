@@ -17,8 +17,11 @@ void barrier::sync() {
 	std::unique_lock<std::mutex> lock(mutex);
 	count++;
 
-	if (count == total) cv.notify_all();
-
-	cv.wait(lock);
-	cv.notify_all();
+	if (count == total) {
+		cv.notify_all();
+		count = 0;
+	}
+	else {
+		cv.wait(lock);
+	}
 }
