@@ -3,13 +3,11 @@
 
 bouncing_balls_sim sim;
 
-void display() {
-	sim.update();
-}
-
 int main(int argc, char **argv) {
 	sim = bouncing_balls_sim(&argc, argv);
-	sim.start(display);
+	sim.start([]() {
+		sim.update(); 
+	});
 
 	return 0;
 }
