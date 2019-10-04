@@ -22,6 +22,7 @@ public:
 struct vector3d : public vector2d {
 	vector3d() = default;
 	vector3d(float X, float Y, float Z);
+	vector3d& operator=(const vector3d& v);
 
 	float z;
 };
