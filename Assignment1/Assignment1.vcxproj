@@ -129,13 +129,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\barrier.cpp" />
     <ClCompile Include="src\bouncing_balls_sim.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\rw_mutex.h" />
     <ClCompile Include="src\vectors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ball.h" />
     <ClInclude Include="src\bouncing_balls_sim.h" />
+    <ClInclude Include="src\barrier.h" />
     <ClInclude Include="src\vectors.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
