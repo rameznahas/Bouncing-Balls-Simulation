@@ -6,7 +6,7 @@ class barrier {
 public:
 	barrier() = default;
 	barrier(int num);
-	barrier& operator=(const barrier& barr);
+	barrier& operator=(const barrier& rhs);
 	void sync();
 
 private:

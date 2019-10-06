@@ -4,7 +4,7 @@ struct vector2d {
 public:
 	vector2d();
 	vector2d(float X, float Y);
-	vector2d& operator=(const vector2d& v);
+	vector2d& operator=(const vector2d& rhs);
 	vector2d& operator+=(const vector2d& v);
 	vector2d& operator-=(const vector2d& v);
 	vector2d operator+(const vector2d& v);
@@ -22,7 +22,7 @@ public:
 struct vector3d : public vector2d {
 	vector3d() = default;
 	vector3d(float X, float Y, float Z);
-	vector3d& operator=(const vector3d& v);
+	vector3d& operator=(const vector3d& rhs);
 
 	float z;
 };

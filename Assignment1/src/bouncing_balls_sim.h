@@ -14,25 +14,26 @@ public:
 	void update();
 
 private:
+	void init();
 	void draw();
-	void wall_collisions();
-	void ball_collisions();
 	bool aabb(const ball& current, const ball& other);
+	void wall_bounce(ball& current);
 
-	// make mutex instead of do_frame
-
-	barrier barrier_;
 	std::vector<ball> balls;
-	std::vector<std::pair<ball&, ball&>> pairs;
+	std::vector<std::pair<ball*, ball*>> pairs;
 	std::vector<std::thread> t_workers;
-
-	clock_t previous_t = 0;
-	clock_t current_t = 0;
-	float delta_t;
-	bool compute;
-	bool do_frame;
-
+	
 	vector2d GRAVITY;
+
+	barrier computation_barrier;
+
+	clock_t previous_t;
+	clock_t current_t;
+	float delta_t;
+	float accumulated_t;
+
+	bool program_running;
+	bool do_frame;
 
 	constexpr static float MIN_RADIUS = 0.05f;
 	constexpr static float PI = 3.141592f;
