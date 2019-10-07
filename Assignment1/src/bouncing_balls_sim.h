@@ -22,18 +22,18 @@ private:
 	std::vector<ball> balls;
 	std::vector<std::pair<ball*, ball*>> pairs;
 	std::vector<std::thread> t_workers;
-	
+
 	vector2d GRAVITY;
 
-	barrier computation_barrier;
+	barrier wall_computation;
+	barrier do_frame;
+	barrier frame_done;
 
 	clock_t previous_t;
 	clock_t current_t;
 	float delta_t;
-	float accumulated_t;
 
 	bool program_running;
-	bool do_frame;
 
 	constexpr static float MIN_RADIUS = 0.05f;
 	constexpr static float PI = 3.141592f;

@@ -7,7 +7,7 @@ public:
 	barrier() = default;
 	barrier(int num);
 	barrier& operator=(const barrier& rhs);
-	void sync();
+	void wait();
 
 private:
 	mutable std::mutex mutex;

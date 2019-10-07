@@ -13,7 +13,7 @@ barrier& barrier::operator=(const barrier& rhs) {
 	return *this;
 }
 
-void barrier::sync() {
+void barrier::wait() {
 	std::unique_lock<std::mutex> lock(mutex);
 	++count;
 
