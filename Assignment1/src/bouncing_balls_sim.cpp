@@ -31,27 +31,33 @@ bouncing_balls_sim::bouncing_balls_sim(int* argc, char **argv)
 	glEnable(GL_BLEND);
 }
 
+/*
+	The worker threads collision computation (ball-wall and ball-ball).
+*/
 void bouncing_balls_sim::operator()(ball& current, int start, int end) {
 	while (program_running) {
+		// wait for control thread to give the command to start
 		do_frame.wait();
-
+		// ball-wall computation
 		wall_bounce(current);
-
+		// wait for all workers to be done with ball-wall computation
 		wall_computation.wait();
-
+		
+		// ball-ball computation
 		for (int i = start; i < end; ++i) {
 			ball* current = pairs[i].first;
 			ball* other = pairs[i].second;
 
-			// check for aabb overlap 
-			if (aabb(*current, *other))
-			{
+			// check for aabb overlap
+			// if true, balls are close enough, computation is worth it.
+			if (aabb(*current, *other)) {
 				vector2d c = current->center - other->center;
 				float min_dist = current->radius + other->radius;
 
-				// check for ball collision
-				if (powf(c.x, 2.f) + powf(c.y, 2.f) <= powf(min_dist, 2.f))
-				{
+				// balls are close enough, but it does not mean they have collided.
+				// check for ball collision.
+				// if true, collision occured, handle it
+				if (powf(c.x, 2.f) + powf(c.y, 2.f) <= powf(min_dist, 2.f)) {
 					float distance = vector2d::magnitude(c);
 					float overlap = 0.5f * (distance - current->radius - other->radius);
 
@@ -71,10 +77,16 @@ void bouncing_balls_sim::operator()(ball& current, int start, int end) {
 				}
 			}
 		}
+		// signal to control that this thread is done.
+		// once all are done, control will go ahead with drawing
+		// the new frame.
 		frame_done.wait();
 	}
 }
 
+/*
+	The control thread task.
+*/
 void bouncing_balls_sim::update() {
 	//update current clock time
 	current_t = clock();
@@ -86,6 +98,7 @@ void bouncing_balls_sim::update() {
 	// store last draw time
 	previous_t = current_t;
 
+	// update the balls' velocity and positions
 	for (ball& ball : balls) {
 		ball.velocity += delta_t * GRAVITY;
 		ball.center += delta_t * ball.velocity;
@@ -93,7 +106,7 @@ void bouncing_balls_sim::update() {
 
 	// notify worker threads to start
 	do_frame.wait();
-	// wait for threads to notifiy that they're done
+	// wait for workers to notifiy that they're done
 	frame_done.wait();
 
 	draw();
@@ -165,6 +178,12 @@ void bouncing_balls_sim::start(void(*callback)()) {
 	}
 }
 
+/*
+	Initialization of simulation.
+		- Creates balls with random radius, centers and velocities.
+		- Caches all the unique ball pairs (optimization).
+		- Creates the worker threads and assigns their tasks.
+*/
 void bouncing_balls_sim::init() {
 	///////////////////////////init balls///////////////////////////
 	std::random_device rd;
@@ -215,10 +234,15 @@ void bouncing_balls_sim::init() {
 	////////////////////////////////////////////////////////////////
 }
 
-bool bouncing_balls_sim::aabb(const ball& current, const ball& other) {
-	// axis-aligned bounding box check (optimization)
-	// if true, circles are close enough. compute further.
+/*
+	Axis-aligned bounding-box check (optimization).
 
+	Checks if balls are close enough to go ahead with actual collision
+	computation (which is more expensive).
+	
+	If true, they are close enough.
+*/
+bool bouncing_balls_sim::aabb(const ball& current, const ball& other) {
 	float min_dist = current.radius + other.radius;
 
 	return (current.center.x + min_dist > other.center.x
